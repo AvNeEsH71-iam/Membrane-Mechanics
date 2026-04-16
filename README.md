@@ -1,7 +1,5 @@
 # Membrane Mechanics
 
-> **Vesicle Fluctuation Spectroscopy** | Bending Rigidity | Angular Auto-Correlation | Legendre Decomposition
-
 A fully browser-based, interactive tool for analysing thermal shape fluctuations of Giant Unilamellar Vesicles (GUVs). Built on the theoretical framework of Brochard–Lennon / Helfrich, this suite lets you:
 
 - **Visualise** angular auto-correlation functions for any combination of spherical-harmonic modes
