@@ -1,4 +1,4 @@
-# GUV Fluctuation Spectroscopy — Interactive Analysis Suite
+# GUV Fluctuation Spectroscopy
 
 > **Vesicle Fluctuation Spectroscopy** | Bending Rigidity | Angular Auto-Correlation | Legendre Decomposition
 
@@ -16,7 +16,7 @@ Model scope note:
 
 ---
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```
 Membrane-Mechanics/
@@ -110,13 +110,9 @@ python3 -m http.server 8080
 
 ---
 
-## 👥 Authors
+## Authors
 
 Avneesh Singh & Ridima Singh — IISER Mohali  
 Supervisor: Dr. Tripta Bhatia
 
----
 
-## 📄 License
-
-MIT License — free to use, modify, and distribute with attribution.
