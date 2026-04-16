@@ -40,7 +40,7 @@ Membrane-Mechanics/
 
 ---
 
-## 🔬 Physics Background
+## Physics Background
 
 ### Helfrich Free Energy
 The membrane elastic energy is:
