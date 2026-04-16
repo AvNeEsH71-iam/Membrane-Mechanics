@@ -19,7 +19,7 @@ Model scope note:
 ## 📁 Repository Structure
 
 ```
-guv-fluctuation-analysis/
+Membrane-Mechanics/
 ├── index.html                  # Landing page / dashboard
 ├── pages/
 │   ├── autocorrelation.html    # Angular auto-correlation visualiser
