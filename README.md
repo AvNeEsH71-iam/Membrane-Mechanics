@@ -1,4 +1,4 @@
-# GUV Fluctuation Spectroscopy
+# Membrane Mechanics
 
 > **Vesicle Fluctuation Spectroscopy** | Bending Rigidity | Angular Auto-Correlation | Legendre Decomposition
 
