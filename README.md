@@ -92,7 +92,7 @@ $$p_l = \frac{4\pi(l-1)(l+2)(l+1)l}{2l+1}, \quad q_l = \frac{4\pi(l-1)(l+2)}{2l+
 
 ## Authors
 
-Avneesh Singh & Ridima Singh — IISER Mohali  
+Avneesh Singh & Ridima Singh : SMBL, IISER Mohali  
 Supervisor: Dr. Tripta Bhatia
 
 
