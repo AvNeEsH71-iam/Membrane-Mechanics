@@ -70,27 +70,7 @@ $$p_l = \frac{4\pi(l-1)(l+2)(l+1)l}{2l+1}, \quad q_l = \frac{4\pi(l-1)(l+2)}{2l+
 
 ---
 
-## 🚀 Usage
-
-No build step required. Simply open `index.html` in any modern browser.
-
-```bash
-git clone https://github.com/YOUR_USERNAME/guv-fluctuation-analysis.git
-cd guv-fluctuation-analysis
-# Open index.html in your browser
-open index.html
-```
-
-Or serve locally:
-
-```bash
-python3 -m http.server 8080
-# → http://localhost:8080
-```
-
----
-
-## 📊 Features by Page
+## Features by Page
 
 | Page | What you can do |
 |------|----------------|
