@@ -14,6 +14,8 @@ Model scope note:
 - The spectroscopy pipeline is intentionally equatorial-contour based (`theta = pi/2`).
 - This matches microscopy contour measurements and does not perform full spherical surface reconstruction.
 
+- Website - https://avneesh71-iam.github.io/Membrane-Mechanics/index.html
+
 ---
 
 ## Repository Structure
