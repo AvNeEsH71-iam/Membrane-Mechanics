@@ -1,0 +1,416 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Legendre Spectrum — GUV Fluctuation Suite</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']]
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+  </script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    .panel-section { padding: 20px; border-bottom: 1px solid var(--border); }
+    .panel-section:last-child { border-bottom: none; }
+    .panel-section-title {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.12em; color: var(--text-dim); margin-bottom: 14px;
+      font-family: var(--font-mono);
+    }
+    .chart-container { height: 340px; }
+    .compare-row { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+    .compare-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .compare-item:hover { border-color: var(--border2); }
+    .compare-item input[type=checkbox] { width: auto; cursor: pointer; }
+    .compare-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .compare-label { font-size: 12px; font-family: var(--font-mono); color: var(--text-mid); }
+  </style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="topnav-brand" href="../index.html">⬡ <span>GUV</span>FlickerSuite</a>
+  <a href="../index.html">Home</a>
+  <a href="theory.html">Theory</a>
+  <a href="autocorrelation.html">Auto-Corr</a>
+  <a href="legendre.html" class="active">Legendre</a>
+  <a href="kappa.html">κ Extraction</a>
+  <a href="computational-workflow.html">Workflow</a>
+</nav>
+
+<div class="page-wrapper">
+  <div class="page-hero">
+    <div class="badge">Legendre Spectrum</div>
+    <h1>Mode Amplitudes <span class="accent">B<sub>l</sub></span></h1>
+    <p>
+      The Legendre spectrum b<sub>l</sub> shows how thermal fluctuation energy is distributed across angular modes.
+      Higher modes are suppressed as bending energy cost grows as ~l⁴. Compare multiple experimental conditions.
+    </p>
+  </div>
+
+  <div class="grid-2">
+    <!-- Controls -->
+    <div class="card" style="padding:0;">
+      <div class="panel-section">
+        <div class="panel-section-title">Primary Parameters</div>
+        <div class="form-group">
+          <label class="form-label">Bending Rigidity κ <span class="eq">[kBT]</span></label>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <input type="range" id="kappa1" min="5" max="100" step="0.5" value="40"
+                   oninput="updateDisplay(); updatePlot()">
+            <span class="range-value mono" id="k1val">40.0</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Effective Surface Tension Σ</label>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <input type="range" id="sigma1" min="0" max="120" step="0.5" value="10"
+                   oninput="updateDisplay(); updatePlot()">
+            <span class="range-value mono" id="s1val">10.0</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Vesicle Radius R <span class="eq">[µm]</span></label>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <input type="range" id="radius" min="5" max="30" step="0.5" value="10"
+                   oninput="updateDisplay(); updatePlot()">
+            <span class="range-value mono" id="rval">10.0</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mode range l<sub>max</sub></label>
+          <select id="lmax2" onchange="updatePlot()">
+            <option value="10" selected>l = 2 … 10</option>
+            <option value="15">l = 2 … 15</option>
+            <option value="20">l = 2 … 20</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Compare presets -->
+      <div class="panel-section">
+        <div class="panel-section-title">Compare Experimental Conditions</div>
+        <div class="compare-row" id="compareList">
+          <label class="compare-item">
+            <input type="checkbox" id="cmp_popc" onchange="updatePlot()">
+            <div class="compare-dot" style="background:#3a4f6c;"></div>
+            <span class="compare-label">POPC water κ=41</span>
+          </label>
+          <label class="compare-item">
+            <input type="checkbox" id="cmp_hepes" onchange="updatePlot()">
+            <div class="compare-dot" style="background:#6c4d56;"></div>
+            <span class="compare-label">POPC HEPES κ=37</span>
+          </label>
+          <label class="compare-item">
+            <input type="checkbox" id="cmp_chol" onchange="updatePlot()">
+            <div class="compare-dot" style="background:#405f52;"></div>
+            <span class="compare-label">POPC+Chol κ=53</span>
+          </label>
+          <label class="compare-item">
+            <input type="checkbox" id="cmp_aa_low" onchange="updatePlot()">
+            <div class="compare-dot" style="background:#6a5b42;"></div>
+            <span class="compare-label">POPC+AA 0.14µM κ=59</span>
+          </label>
+          <label class="compare-item">
+            <input type="checkbox" id="cmp_aa_high" onchange="updatePlot()">
+            <div class="compare-dot" style="background:#5a566f;"></div>
+            <span class="compare-label">POPC+AA 1.34µM κ=50</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Log/Lin toggle -->
+      <div class="panel-section">
+        <div class="panel-section-title">Scale</div>
+        <div style="display:flex;gap:8px;">
+          <button id="btnLin" class="btn btn-primary" style="flex:1;font-size:11px;padding:8px;" onclick="setScale('linear')">Linear</button>
+          <button id="btnLog" class="btn btn-secondary" style="flex:1;font-size:11px;padding:8px;" onclick="setScale('logarithmic')">Log</button>
+        </div>
+      </div>
+
+      <!-- Derived quantities -->
+      <div class="panel-section">
+        <div class="panel-section-title">Derived Quantities</div>
+        <div id="derivedBox">
+          <!-- filled by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div style="display:flex;flex-direction:column;gap:20px;">
+      <!-- b_l vs l -->
+      <div class="chart-wrap">
+        <div class="chart-title">Legendre Coefficients B<sub>l</sub> vs Mode l</div>
+        <div class="chart-container">
+          <canvas id="blChart"></canvas>
+        </div>
+        <div class="chart-subtitle">
+          \[
+          b_l = \frac{2l+1}{4\pi}\,\frac{k_B T}{\kappa(l-1)(l+2)\left[l(l+1)+\Sigma\right]}
+          \]
+        </div>
+      </div>
+
+      <!-- Mode stiffness α_l -->
+      <div class="chart-wrap">
+        <div class="chart-title">Mode Stiffness α<sub>l</sub>/κ = (l−1)(l+2)[l(l+1)+Σ]</div>
+        <div class="chart-container" style="height:240px;">
+          <canvas id="alphaChart"></canvas>
+        </div>
+        <div class="chart-subtitle">
+          \(\alpha_l/\kappa=(l-1)(l+2)\left[l(l+1)+\Sigma\right]\): higher modes carry less thermal energy.
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="card">
+        <div class="card-title">Numerical Values</div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>l</th>
+              <th>p<sub>l</sub></th>
+              <th>q<sub>l</sub></th>
+              <th>α<sub>l</sub>/κ</th>
+              <th>b<sub>l</sub></th>
+              <th>Σ b<sub>l</sub></th>
+            </tr>
+          </thead>
+          <tbody id="spectrumTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../js/physics.js"></script>
+<script>
+let blChartInst = null, alphaChartInst = null;
+let yScale = 'linear';
+
+function setScale(s) {
+  yScale = s;
+  document.getElementById('btnLin').className = s === 'linear' ? 'btn btn-primary' : 'btn btn-secondary';
+  document.getElementById('btnLog').className = s === 'logarithmic' ? 'btn btn-primary' : 'btn btn-secondary';
+  document.getElementById('btnLin').style = 'flex:1;font-size:11px;padding:8px;';
+  document.getElementById('btnLog').style = 'flex:1;font-size:11px;padding:8px;';
+  updatePlot();
+}
+
+function updateDisplay() {
+  document.getElementById('k1val').textContent = parseFloat(document.getElementById('kappa1').value).toFixed(1);
+  document.getElementById('s1val').textContent = parseFloat(document.getElementById('sigma1').value).toFixed(1);
+  document.getElementById('rval').textContent = parseFloat(document.getElementById('radius').value).toFixed(1);
+}
+
+const COMPARE_PRESETS = [
+  { id: 'cmp_popc',    kappa: 40.9, sigma: 8,  label: 'POPC water',      color: '#3a4f6c' },
+  { id: 'cmp_hepes',   kappa: 37.3, sigma: 10, label: 'POPC HEPES',      color: '#6c4d56' },
+  { id: 'cmp_chol',    kappa: 53.3, sigma: 12, label: 'POPC+Chol',       color: '#405f52' },
+  { id: 'cmp_aa_low',  kappa: 59.3, sigma: 15, label: 'AA 0.14µM',       color: '#6a5b42' },
+  { id: 'cmp_aa_high', kappa: 49.7, sigma: 12, label: 'AA 1.34µM',       color: '#5a566f' },
+];
+
+function updatePlot() {
+  const kappa = parseFloat(document.getElementById('kappa1').value);
+  const sigma = parseFloat(document.getElementById('sigma1').value);
+  const lmax = parseInt(document.getElementById('lmax2').value);
+  const modes = Array.from({ length: lmax - 1 }, (_, i) => i + 2);
+
+  // ── b_l chart ──
+  const primaryBl = modes.map(l => bl_theory(l, kappa, sigma));
+
+  const datasets_bl = [{
+    label: `κ=${kappa.toFixed(1)} Σ=${sigma.toFixed(1)}`,
+    data: primaryBl,
+    borderColor: '#2a486b',
+    backgroundColor: 'rgba(42,72,107,0.08)',
+    borderWidth: 2.5,
+    pointRadius: 5,
+    pointBackgroundColor: '#2a486b',
+    pointBorderColor: '#070b12',
+    pointBorderWidth: 1.5,
+    fill: yScale === 'linear',
+    tension: 0.1,
+  }];
+
+  // Compare overlays
+  for (const p of COMPARE_PRESETS) {
+    const cb = document.getElementById(p.id);
+    if (cb && cb.checked) {
+      datasets_bl.push({
+        label: `${p.label} κ=${p.kappa}`,
+        data: modes.map(l => bl_theory(l, p.kappa, p.sigma)),
+        borderColor: p.color,
+        backgroundColor: 'transparent',
+        borderWidth: 1.5,
+        borderDash: [5, 4],
+        pointRadius: 4,
+        pointBackgroundColor: p.color,
+        pointBorderColor: '#070b12',
+        pointBorderWidth: 1,
+        fill: false,
+        tension: 0.1,
+      });
+    }
+  }
+
+  if (blChartInst) blChartInst.destroy();
+  blChartInst = new Chart(document.getElementById('blChart').getContext('2d'), {
+    type: 'line',
+    data: { labels: modes, datasets: datasets_bl },
+    options: {
+      animation: { duration: 250 },
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {
+          display: true,
+          labels: { color: '#e5e7eb', font: { family: 'Times New Roman', size: 10 }, boxWidth: 12 }
+        },
+        tooltip: {
+          backgroundColor: '#111827', borderColor: '#334155', borderWidth: 1,
+          titleFont: { family: 'Times New Roman' }, bodyFont: { family: 'Times New Roman', size: 11 },
+          callbacks: {
+            title: items => `l = ${items[0].label}`,
+            label: item => ` ${item.dataset.label}: ${parseFloat(item.raw).toExponential(4)}`,
+          }
+        }
+      },
+      scales: {
+        x: {
+          title: { display: true, text: 'Mode l', color: '#e5e7eb', font: { family: 'Times New Roman', size: 11 } },
+          ticks: { color: '#e5e7eb', font: { family: 'Times New Roman', size: 11 } },
+          grid: { color: 'rgba(148,163,184,0.14)' },
+        },
+        y: {
+          type: yScale,
+          title: { display: true, text: 'b_l', color: '#e5e7eb', font: { family: 'Times New Roman', size: 11 } },
+          ticks: {
+            color: '#e5e7eb', font: { family: 'Times New Roman', size: 10 },
+            callback: v => v.toExponential(1),
+          },
+          grid: { color: 'rgba(148,163,184,0.14)' },
+        }
+      }
+    }
+  });
+
+  // ── α_l chart ──
+  const alphas = modes.map(l => (l - 1) * (l + 2) * (l * (l + 1) + sigma));
+  if (alphaChartInst) alphaChartInst.destroy();
+  alphaChartInst = new Chart(document.getElementById('alphaChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: modes,
+      datasets: [{
+        label: 'α_l / κ',
+        data: alphas,
+        backgroundColor: modes.map((l, i) => `rgba(58,79,108,${0.3 + 0.05*i})`),
+        borderColor: '#3a4f6c',
+        borderWidth: 1,
+        borderRadius: 3,
+      }]
+    },
+    options: {
+      animation: { duration: 200 },
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#111827', borderColor: '#334155', borderWidth: 1,
+          titleFont: { family: 'Times New Roman' }, bodyFont: { family: 'Times New Roman', size: 11 },
+          callbacks: {
+            title: items => `l = ${items[0].label}`,
+            label: item => ` α_l/κ = ${parseInt(item.raw).toLocaleString()}`,
+          }
+        }
+      },
+      scales: {
+        x: {
+          title: { display: true, text: 'Mode l', color: '#e5e7eb', font: { family: 'Times New Roman', size: 11 } },
+          ticks: { color: '#e5e7eb', font: { family: 'Times New Roman', size: 11 } },
+          grid: { color: 'rgba(148,163,184,0.14)' },
+        },
+        y: {
+          ticks: { color: '#e5e7eb', font: { family: 'Times New Roman', size: 10 } },
+          grid: { color: 'rgba(148,163,184,0.14)' },
+        }
+      }
+    }
+  });
+
+  // ── Table ──
+  let cumSum = 0;
+  let tableHTML = '';
+  for (const l of modes) {
+    const pl = pl_factor(l);
+    const ql = ql_factor(l);
+    const alpha = (l - 1) * (l + 2) * (l * (l + 1) + sigma);
+    const bl = bl_theory(l, kappa, sigma);
+    cumSum += bl;
+    tableHTML += `
+      <tr>
+        <td class="num">${l}</td>
+        <td class="num">${pl.toFixed(2)}</td>
+        <td class="num">${ql.toFixed(2)}</td>
+        <td class="num">${alpha.toFixed(0)}</td>
+        <td class="num">${bl.toExponential(3)}</td>
+        <td class="num">${cumSum.toExponential(3)}</td>
+      </tr>`;
+  }
+  document.getElementById('spectrumTableBody').innerHTML = tableHTML;
+
+  // ── Derived quantities ──
+  const sigma_phys = (sigma * kappa) / (parseFloat(document.getElementById('radius').value) ** 2);
+  document.getElementById('derivedBox').innerHTML = `
+    <div class="result-box" style="padding:16px;">
+      <div class="result-row">
+        <span class="result-key">κ</span>
+        <span class="result-val">${kappa.toFixed(2)} kBT</span>
+      </div>
+      <div class="result-row">
+        <span class="result-key">Σ = σR²/κ</span>
+        <span class="result-val">${sigma.toFixed(2)}</span>
+      </div>
+      <div class="result-row">
+        <span class="result-key">σ (surface tension)</span>
+        <span class="result-val">${sigma_phys.toFixed(2)} kBT/µm²</span>
+      </div>
+      <div class="result-row">
+        <span class="result-key">b<sub>2</sub> / b<sub>10</sub></span>
+        <span class="result-val">${(bl_theory(2,kappa,sigma)/bl_theory(10,kappa,sigma)).toFixed(0)}</span>
+      </div>
+    </div>`;
+}
+
+updateDisplay();
+updatePlot();
+if (window.MathJax && typeof window.MathJax.typesetPromise === 'function') {
+  window.MathJax.typesetPromise();
+}
+</script>
+</body>
+</html>
+
+
+

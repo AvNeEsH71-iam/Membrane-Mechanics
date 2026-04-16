@@ -1,0 +1,636 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Computational Workflow - GUV Fluctuation Suite</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']]
+      },
+      chtml: {
+        scale: 1.1
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+  </script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    .workflow-grid {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+    @media (max-width: 980px) {
+      .workflow-grid { grid-template-columns: 1fr; }
+    }
+
+    .panel-section {
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .panel-section:last-child { border-bottom: none; }
+    .panel-section-title {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-dim);
+      margin-bottom: 14px;
+      font-family: var(--font-mono);
+    }
+
+    .step-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 0 rgba(255,255,255,0.02) inset;
+    }
+    .step-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--cyan);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .step-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+    .step-desc {
+      color: var(--text-mid);
+      font-size: 13px;
+      line-height: 1.7;
+      margin-bottom: 12px;
+    }
+
+    .math-chip {
+      font-family: "Times New Roman", "STIX Two Text", Georgia, serif;
+      font-size: 16px;
+      line-height: 1.72;
+      color: var(--text);
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+      overflow-x: auto;
+      white-space: normal;
+    }
+    .math-chip mjx-container[display="true"] {
+      margin: 0.85em 0;
+    }
+
+    .calc-panel {
+      margin-top: 12px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+    }
+    .calc-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .calc-title {
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text-dim);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0;
+    }
+    .calc-toggle {
+      background: transparent;
+      color: var(--cyan);
+      border: 1px solid var(--border2);
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: border-color 0.2s ease, color 0.2s ease;
+    }
+    .calc-toggle:hover {
+      border-color: var(--cyan);
+      color: #9cc4ff;
+    }
+    .calc-eq {
+      font-family: "Times New Roman", "STIX Two Text", Georgia, serif;
+      font-size: 16px;
+      color: var(--text);
+      line-height: 1.75;
+      margin-bottom: 10px;
+    }
+    .calc-eq p {
+      margin-bottom: 8px;
+    }
+    .calc-eq mjx-container[display="true"] {
+      margin: 0.9em 0;
+    }
+    .calc-steps {
+      margin: 10px 0 12px;
+      padding: 12px 12px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: rgba(15, 23, 42, 0.35);
+    }
+    .calc-steps[hidden] {
+      display: none;
+    }
+    .calc-steps-title {
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text-mid);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .calc-steps-list {
+      margin-left: 20px;
+      color: var(--text);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+    .calc-steps-list li {
+      margin-bottom: 8px;
+    }
+    .calc-steps-list mjx-container[display="true"] {
+      margin: 0.65em 0;
+    }
+    .calc-table-wrap {
+      overflow-x: auto;
+    }
+    .calc-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-mid);
+    }
+    .calc-table th, .calc-table td {
+      border-bottom: 1px solid rgba(36,53,82,0.8);
+      padding: 6px 8px;
+      text-align: right;
+      white-space: nowrap;
+    }
+    .calc-table th:first-child,
+    .calc-table td:first-child {
+      text-align: left;
+    }
+    .calc-table th {
+      color: var(--text-mid);
+      font-weight: 600;
+    }
+
+    .chart-container { height: 280px; }
+    .chart-container-short { height: 220px; }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    @media (max-width: 1100px) {
+      .summary-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .summary-grid { grid-template-columns: 1fr; }
+    }
+
+    .summary-tile {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+    }
+    .summary-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 6px;
+    }
+    .summary-value {
+      color: var(--text);
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .workflow-note {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-top: 10px;
+      line-height: 1.6;
+    }
+
+    .canvas-wrap {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px;
+      margin-top: 8px;
+    }
+    .contour-canvas {
+      width: 100%;
+      height: 280px;
+      display: block;
+      border-radius: 6px;
+      background: #111827;
+    }
+
+    .model-panel {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    .model-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    @media (max-width: 900px) {
+      .model-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .model-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+    }
+
+    .model-card h3 {
+      margin-bottom: 8px;
+      font-size: 16px;
+      letter-spacing: 0.01em;
+    }
+
+    .section-kicker {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-dim);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .mini-list {
+      margin-top: 8px;
+      color: var(--text-mid);
+      font-size: 12px;
+      line-height: 1.65;
+    }
+    .mini-list li { margin-left: 16px; }
+  </style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="topnav-brand" href="../index.html">⬡ <span>GUV</span>FlickerSuite</a>
+  <a href="../index.html">Home</a>
+  <a href="theory.html">Theory</a>
+  <a href="autocorrelation.html">Auto-Corr</a>
+  <a href="legendre.html">Legendre</a>
+  <a href="kappa.html">κ Extraction</a>
+  <a href="computational-workflow.html" class="active">Workflow</a>
+</nav>
+
+<div class="page-wrapper">
+  <div class="page-hero">
+    <div class="badge">Computational Walkthrough</div>
+    <h1>Calculation, <span class="accent">Step by Step</span></h1>
+    <p>
+      This page teaches the full computational workflow used in vesicle fluctuation spectroscopy: generate a random quasi-spherical vesicle,
+      compute angular autocorrelation, project the Legendre spectrum, and fit for \(\kappa\) and \(\Sigma\) using \(\chi^2\) minimisation.
+    </p>
+  </div>
+
+  <div class="model-panel">
+    <div class="section-kicker">Model</div>
+    <div class="paper-section-title">Model Description</div>
+    <p class="paper-section-note">
+      We restrict the contour to the equator \(\theta=\pi/2\), map fluctuations through spherical harmonics,
+      and project the correlation into Legendre modes for statistically stable \(\kappa\)-\(\Sigma\) fitting.
+    </p>
+    <div class="model-grid">
+      <div class="model-card">
+        <h3>Equatorial Quasi-Spherical Contour</h3>
+        <div class="eq-block" style="margin:8px 0 0;">
+          \[
+          r(\phi,t)=R\left[1+u\left(\theta=\frac{\pi}{2},\phi,t\right)\right]
+          \]
+        </div>
+      </div>
+      <div class="model-card">
+        <h3>Spherical Harmonic Expansion</h3>
+        <div class="eq-block" style="margin:8px 0 0;">
+          \[
+          u(\theta,\phi,t)=\sum_{l,m}u_{lm}(t)Y_l^m(\theta,\phi)
+          \]
+        </div>
+      </div>
+      <div class="model-card">
+        <h3>Equipartition Amplitude</h3>
+        <div class="eq-block" style="margin:8px 0 0;">
+          \[
+          \left\langle |u_{lm}|^2 \right\rangle=
+          \frac{k_B T}{\kappa(l+2)(l-1)\left[l(l+1)+\Sigma\right]}
+          \]
+        </div>
+      </div>
+      <div class="model-card">
+        <h3>Autocorrelation and Projection</h3>
+        <div class="eq-block" style="margin:8px 0 0;">
+          \[
+          \xi(\gamma)=\left\langle u(\phi)u(\phi+\gamma)\right\rangle,
+          \qquad
+          \xi(\gamma)=\sum_l b_l P_l(\cos\gamma)
+          \]
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="workflow-grid">
+    <div class="card" style="padding:0;">
+      <div class="panel-section">
+        <div class="panel-section-title">Model Parameters</div>
+
+        <div class="form-group">
+          <label class="form-label">True κ used for generation <span class="eq">[kBT]</span></label>
+          <input id="wfKappaTrue" type="number" step="0.1" min="2" max="200" value="42.0" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">True Σ used for generation</label>
+          <input id="wfSigmaTrue" type="number" step="0.1" min="-10" max="200" value="10.0" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Average radius R <span class="eq">[μm]</span></label>
+          <input id="wfRadius" type="number" step="0.5" min="2" max="50" value="10.0" />
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Maximum harmonic mode l_max</label>
+          <input id="wfLMax" type="number" step="1" min="4" max="20" value="10" />
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="panel-section-title">Sampling Setup</div>
+
+        <div class="form-group">
+          <label class="form-label">Angular points per contour n_phi</label>
+          <select id="wfNPhi">
+            <option value="128">128</option>
+            <option value="256" selected>256</option>
+            <option value="512">512</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Frames n_frames</label>
+          <input id="wfNFrames" type="number" step="10" min="30" max="400" value="120" />
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Seed (reproducible randomness)</label>
+          <input id="wfSeed" type="number" step="1" min="1" max="99999999" value="12345" />
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="panel-section-title">Projection and Fit Window</div>
+        <div class="form-group">
+          <label class="form-label">l_min for fit</label>
+          <input id="wfFitLMin" type="number" step="1" min="2" max="18" value="2" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">l_max for fit</label>
+          <input id="wfFitLMax" type="number" step="1" min="4" max="20" value="10" />
+        </div>
+        <div class="workflow-note">
+          Use a fit window where your B_l values are reliable. Very high l modes are often noise dominated in experiments.
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <button id="wfRunBtn" class="btn btn-primary btn-full">Run Full Workflow</button>
+        <button id="wfReseedBtn" class="btn btn-secondary btn-full" style="margin-top:8px;">Randomise Seed</button>
+        <div class="workflow-note">
+          The full pipeline is executed in browser JavaScript, mirroring the same sequence as your Python quasi_spherical workflow.
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="step-card">
+        <div class="step-badge">Step 1</div>
+        <div class="section-kicker">Contour Visualization</div>
+        <div class="step-title">Generate Quasi-Spherical Contours</div>
+        <div class="step-desc">
+          Thermal modes are sampled with variance inversely proportional to mode stiffness, then combined into an equatorial contour time-series.
+        </div>
+        <div class="math-chip">\[\mathrm{var}_l=\frac{1}{\kappa(l-1)(l+2)\left[l(l+1)+\Sigma\right]}\]</div>
+        <div class="canvas-wrap">
+          <canvas id="wfContourCanvas" class="contour-canvas" width="760" height="420"></canvas>
+        </div>
+        <div class="workflow-note" id="wfContourCaption">Awaiting simulation.</div>
+        <div class="calc-panel">
+          <div class="calc-header">
+            <div class="calc-title">Calculation Log - Thermal Mode Sampling</div>
+            <button class="calc-toggle" data-target="wfStep1Steps" aria-expanded="false">Show Step-by-Step</button>
+          </div>
+          <div class="calc-eq" id="wfStep1Equation">Run simulation to display numeric substitution.</div>
+          <div class="calc-steps" id="wfStep1Steps" hidden>
+            <div class="calc-steps-title">Step-by-Step Derivation</div>
+            <ol class="calc-steps-list" id="wfStep1StepList"></ol>
+          </div>
+          <div class="calc-table-wrap">
+            <table class="calc-table">
+              <thead>
+                <tr>
+                  <th>mode l</th>
+                  <th>D_l</th>
+                  <th>var_l</th>
+                  <th>sqrt(var_l)</th>
+                </tr>
+              </thead>
+              <tbody id="wfStep1TableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-badge">Step 2</div>
+        <div class="section-kicker">Autocorrelation Function</div>
+        <div class="step-title">Compute Angular Auto-Correlation</div>
+        <div class="step-desc">
+          For each frame, compute ξ(γ, t) from circular shifts of the contour and average over time.
+        </div>
+        <div class="math-chip">\[\xi(\gamma)=\frac{1}{2\pi r_{\mathrm{avg}}^2}\int_0^{2\pi}\left[r(\phi+\gamma)-r_{\mathrm{avg}}\right]\left[r(\phi)-r_{\mathrm{avg}}\right]d\phi\]</div>
+        <div class="chart-container"><canvas id="wfXiChart"></canvas></div>
+        <div class="calc-panel">
+          <div class="calc-header">
+            <div class="calc-title">Calculation Log - Correlation at One γ</div>
+            <button class="calc-toggle" data-target="wfStep2Steps" aria-expanded="false">Show Step-by-Step</button>
+          </div>
+          <div class="calc-eq" id="wfStep2Equation">Run simulation to display numeric substitution.</div>
+          <div class="calc-steps" id="wfStep2Steps" hidden>
+            <div class="calc-steps-title">Step-by-Step Derivation</div>
+            <ol class="calc-steps-list" id="wfStep2StepList"></ol>
+          </div>
+          <div class="calc-table-wrap">
+            <table class="calc-table">
+              <thead>
+                <tr>
+                  <th>i</th>
+                  <th>w_i</th>
+                  <th>r_i-r_avg</th>
+                  <th>r_i+g-r_avg</th>
+                  <th>term</th>
+                </tr>
+              </thead>
+              <tbody id="wfStep2TableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-badge">Step 3</div>
+        <div class="section-kicker">Legendre Spectrum</div>
+        <div class="step-title">Project Legendre Coefficients</div>
+        <div class="step-desc">
+          The averaged correlation is projected onto P_l(cos(gamma)) to obtain B_l in the selected mode window.
+        </div>
+        <div class="math-chip">\[b_l=\frac{2l+1}{2}\int_0^{\pi}\xi(\gamma)P_l(\cos\gamma)\sin\gamma\,d\gamma\]</div>
+        <div class="chart-container-short"><canvas id="wfBlChart"></canvas></div>
+        <div class="calc-panel">
+          <div class="calc-header">
+            <div class="calc-title">Calculation Log - Legendre Projection</div>
+            <button class="calc-toggle" data-target="wfStep3Steps" aria-expanded="false">Show Step-by-Step</button>
+          </div>
+          <div class="calc-eq" id="wfStep3Equation">Run simulation to display numeric substitution.</div>
+          <div class="calc-steps" id="wfStep3Steps" hidden>
+            <div class="calc-steps-title">Step-by-Step Derivation</div>
+            <ol class="calc-steps-list" id="wfStep3StepList"></ol>
+          </div>
+          <div class="calc-table-wrap">
+            <table class="calc-table">
+              <thead>
+                <tr>
+                  <th>γ (deg)</th>
+                  <th>ξ</th>
+                  <th>P_l(cos γ)</th>
+                  <th>sin(γ)</th>
+                  <th>integrand</th>
+                </tr>
+              </thead>
+              <tbody id="wfStep3TableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-badge">Step 4</div>
+        <div class="section-kicker">Parameter Estimation</div>
+        <div class="step-title">Fit \(\kappa\) and \(\Sigma\) via χ²</div>
+        <div class="step-desc">
+          Compute χ² over Σ, find the minimum, recover j = kBT/κ, and therefore the fitted κ.
+        </div>
+        <div class="math-chip">\[\bar{B}_l(j,s)=\frac{j}{p_l+s q_l},\qquad \chi^2=\sum_l\left(\frac{B_l-\bar{B}_l}{\sigma_l}\right)^2\]</div>
+
+        <div class="summary-grid" id="wfSummaryGrid">
+          <div class="summary-tile">
+            <div class="summary-label">κ true</div>
+            <div class="summary-value" id="wfKappaTrueOut">-</div>
+          </div>
+          <div class="summary-tile">
+            <div class="summary-label">κ fitted</div>
+            <div class="summary-value" id="wfKappaFitOut">-</div>
+          </div>
+          <div class="summary-tile">
+            <div class="summary-label">Σ true</div>
+            <div class="summary-value" id="wfSigmaTrueOut">-</div>
+          </div>
+          <div class="summary-tile">
+            <div class="summary-label">Σ fitted</div>
+            <div class="summary-value" id="wfSigmaFitOut">-</div>
+          </div>
+        </div>
+
+        <div class="chart-container-short" style="margin-top:12px;"><canvas id="wfChiChart"></canvas></div>
+        <div class="chart-container-short" style="margin-top:12px;"><canvas id="wfFitChart"></canvas></div>
+
+        <div class="calc-panel" style="margin-top:12px;">
+          <div class="calc-header">
+            <div class="calc-title">Calculation Log - χ² Contributions</div>
+            <button class="calc-toggle" data-target="wfStep4Steps" aria-expanded="false">Show Step-by-Step</button>
+          </div>
+          <div class="calc-eq" id="wfStep4Equation">Run simulation to display numeric substitution.</div>
+          <div class="calc-steps" id="wfStep4Steps" hidden>
+            <div class="calc-steps-title">Step-by-Step Derivation</div>
+            <ol class="calc-steps-list" id="wfStep4StepList"></ol>
+          </div>
+          <div class="calc-table-wrap">
+            <table class="calc-table">
+              <thead>
+                <tr>
+                  <th>l</th>
+                  <th>B_l(exp)</th>
+                  <th>σ_l</th>
+                  <th>B_l(th)</th>
+                  <th>residual</th>
+                  <th>residual²</th>
+                </tr>
+              </thead>
+              <tbody id="wfStep4TableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <ul class="mini-list" id="wfFitMeta">
+          <li>Run the workflow to populate fit diagnostics.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../js/physics.js"></script>
+<script src="../js/computational-workflow.js"></script>
+</body>
+</html>
+
+

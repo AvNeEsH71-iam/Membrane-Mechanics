@@ -1,0 +1,377 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Theory Reference — GUV Fluctuation Suite</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']]
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+  </script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.min.js"></script>
+  <style>
+    .theory-body {
+      max-width: 820px;
+      margin: 0 auto;
+    }
+    .theory-section {
+      margin-bottom: 48px;
+    }
+    .theory-h2 {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .theory-h2 .num {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--cyan);
+      margin-right: 12px;
+      font-weight: 400;
+    }
+    .theory-h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin: 28px 0 10px;
+    }
+    .theory-p {
+      color: var(--text-mid);
+      font-size: 14px;
+      line-height: 1.8;
+      margin-bottom: 14px;
+    }
+    .math-block {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--cyan);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 16px 20px;
+      margin: 16px 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--text);
+    }
+    .toc {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px 24px;
+      margin-bottom: 48px;
+    }
+    .toc-title {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+      margin-bottom: 12px;
+    }
+    .toc-item {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      padding: 5px 0;
+      text-decoration: none;
+      color: var(--text-mid);
+      font-size: 13px;
+      transition: color 0.2s;
+    }
+    .toc-item:hover { color: var(--cyan); }
+    .toc-num {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-dim);
+      min-width: 20px;
+    }
+    .highlight-box {
+      background: rgba(148,163,184,0.08);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      margin: 16px 0;
+      font-size: 13px;
+      color: var(--text-mid);
+    }
+    .highlight-box strong { color: var(--cyan); }
+    .param-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+    .param-table td { padding: 8px 12px; border-bottom: 1px solid rgba(148,163,184,0.18); font-size: 13px; }
+    .param-table td:first-child { font-family: var(--font-mono); color: var(--cyan); width: 120px; }
+    .param-table td:nth-child(2) { color: var(--text-mid); }
+    .param-table td:nth-child(3) { color: var(--text-dim); font-family: var(--font-mono); font-size: 11px; }
+  </style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="topnav-brand" href="../index.html">⬡ <span>GUV</span>FlickerSuite</a>
+  <a href="../index.html">Home</a>
+  <a href="theory.html" class="active">Theory</a>
+  <a href="autocorrelation.html">Auto-Corr</a>
+  <a href="legendre.html">Legendre</a>
+  <a href="kappa.html">κ Extraction</a>
+  <a href="computational-workflow.html">Workflow</a>
+</nav>
+
+<div class="page-wrapper">
+  <div class="page-hero">
+    <div class="badge">Theory Reference</div>
+    <h1>From Flicker to <span class="accent">Physics</span></h1>
+    <p>
+      Complete derivation of vesicle fluctuation spectroscopy: from the Helfrich elastic energy
+      to χ² parameter extraction.
+    </p>
+  </div>
+
+  <div class="theory-body">
+
+    <!-- Table of Contents -->
+    <div class="toc">
+      <div class="toc-title">Contents</div>
+      <a class="toc-item" href="#helfrich"><span class="toc-num">1</span> Helfrich Free Energy</a>
+      <a class="toc-item" href="#quasispherical"><span class="toc-num">2</span> Quasi-Spherical Vesicles & Spherical Harmonics</a>
+      <a class="toc-item" href="#fluctuation"><span class="toc-num">3</span> Fluctuation Spectrum & Equipartition</a>
+      <a class="toc-item" href="#autocorr"><span class="toc-num">4</span> Angular Auto-Correlation Function</a>
+      <a class="toc-item" href="#legendre"><span class="toc-num">5</span> Legendre Expansion</a>
+      <a class="toc-item" href="#extraction"><span class="toc-num">6</span> Parameter Extraction (χ² Method)</a>
+      <a class="toc-item" href="#errors"><span class="toc-num">7</span> Error Estimation (Covariance Matrix)</a>
+      <a class="toc-item" href="#references"><span class="toc-num">8</span> References</a>
+    </div>
+
+    <!-- 1. Helfrich -->
+    <div class="theory-section" id="helfrich">
+      <h2 class="theory-h2"><span class="num">01</span>Helfrich Free Energy</h2>
+      <p class="theory-p">
+        The elastic free energy of a lipid bilayer is described by the Helfrich functional.
+        The local energy density depends on curvature and tension:
+      </p>
+      <div class="math-block">
+        \[ e = \frac{1}{2}\kappa(2H - C_0)^2 + \sigma \]
+      </div>
+      <p class="theory-p">
+        Integrating over the vesicle surface gives:
+      </p>
+      <div class="math-block">
+        \[ F_\text{Hel} = \int_S \frac{\kappa}{2}(2H - C_0)^2 \, dA + \sigma A \]
+      </div>
+      <table class="param-table">
+        <tr><td>κ</td><td>Bending rigidity</td><td>units: kBT ≈ 10⁻²¹ J</td></tr>
+        <tr><td>σ</td><td>Membrane surface tension</td><td>units: kBT/µm²</td></tr>
+        <tr><td>C₀</td><td>Spontaneous curvature</td><td>units: µm⁻¹</td></tr>
+        <tr><td>H</td><td>Mean curvature = (c₁+c₂)/2</td><td>c₁,c₂ = principal curvatures</td></tr>
+      </table>
+      <div class="highlight-box">
+        <strong>Physical meaning:</strong> κ penalises bending. σ penalises area change.
+        C₀ ≠ 0 means the membrane has an intrinsic preferred curvature (asymmetry between leaflets).
+      </div>
+    </div>
+
+    <!-- 2. Quasi-Spherical -->
+    <div class="theory-section" id="quasispherical">
+      <h2 class="theory-h2"><span class="num">02</span>Quasi-Spherical Vesicles</h2>
+      <p class="theory-p">
+        GUVs are nearly spherical. We describe small deviations from a perfect sphere of radius R₀:
+      </p>
+      <div class="math-block">
+        \[ r(\theta, \phi) = R_0 \left[ 1 + u(\theta, \phi) \right], \quad |u| \ll 1 \]
+      </div>
+      <p class="theory-p">
+        The fluctuation field u(θ,φ) can be expanded in spherical harmonics Y_l^m(θ,φ),
+        which are the natural eigenmodes of shape deformations on a sphere:
+      </p>
+      <div class="math-block">
+        \[ u(\theta, \phi) = \sum_{l=0}^{\infty} \sum_{m=-l}^{l} u_{lm} \, Y_l^m(\theta, \phi) \]
+      </div>
+      <div class="highlight-box">
+        <strong>Physical modes:</strong>
+        l=0 → volume change (suppressed by incompressibility) ·
+        l=1 → rigid translation (zero energy) ·
+        l≥2 → genuine shape fluctuations (physical, analysed here)
+      </div>
+    </div>
+
+    <!-- 3. Fluctuation Spectrum -->
+    <div class="theory-section" id="fluctuation">
+      <h2 class="theory-h2"><span class="num">03</span>Fluctuation Spectrum & Equipartition</h2>
+      <p class="theory-p">
+        Inserting the spherical harmonic expansion into the Helfrich energy and retaining
+        quadratic terms yields a sum of independent harmonic oscillators:
+      </p>
+      <div class="math-block">
+        \[ F = \sum_{l,m} \frac{1}{2} \alpha_l |u_{lm}|^2 \]
+      </div>
+      <p class="theory-p">where the mode stiffness is:</p>
+      <div class="math-block">
+        \[ \alpha_l = \kappa(l-1)(l+2)\left[l(l+1) + \Sigma\right] \]
+        \[ \Sigma = \frac{\sigma R^2}{\kappa} + \frac{R^2 C_0^2}{2} + 2RC_0 \]
+      </div>
+      <p class="theory-p">
+        The equipartition theorem assigns ½kBT of energy per quadratic degree of freedom:
+      </p>
+      <div class="math-block">
+        \[ \frac{1}{2} \alpha_l \langle|u_{lm}|^2\rangle = \frac{1}{2} k_B T \]
+        \[ \Rightarrow \quad \langle|u_{lm}|^2\rangle = \frac{k_B T}{\alpha_l} = \frac{k_B T}{\kappa(l-1)(l+2)\left[l(l+1)+\Sigma\right]} \]
+      </div>
+      <div class="highlight-box">
+        <strong>Key insight:</strong> Stiffer modes (larger α_l) have smaller amplitudes.
+        Low-l modes probe surface tension Σ; high-l modes probe bending rigidity κ.
+      </div>
+    </div>
+
+    <!-- 4. Auto-Correlation -->
+    <div class="theory-section" id="autocorr">
+      <h2 class="theory-h2"><span class="num">04</span>Angular Auto-Correlation Function</h2>
+      <p class="theory-p">
+        In experiments we image the vesicle equator. The equatorial contour gives
+        r_eq(φ,t) = R[1 + u(π/2, φ, t)]. The instantaneous angular average is:
+      </p>
+      <div class="math-block">
+        \[ r_\text{avg}(t) = \frac{1}{2\pi}\int_0^{2\pi} r_{eq}(\phi, t)\, d\phi \]
+      </div>
+      <p class="theory-p">
+        The equatorial angular auto-correlation function quantifies how the contour shape
+        at angle φ correlates with the shape at φ+γ:
+      </p>
+      <div class="math-block">
+        \[ \xi_{eq}(\gamma, t) = \frac{1}{2\pi r_\text{avg}^2} \int_0^{2\pi}
+        \left[ r_{eq}(\phi+\gamma, t)\, r_{eq}(\phi, t) - r_\text{avg}^2 \right] d\phi \]
+      </div>
+      <p class="theory-p">
+        For small fluctuations (|u| ≪ 1), using Taylor expansion of the normalisation factor:
+      </p>
+      <div class="math-block">
+        \[ \xi_{eq}(\gamma, t) \approx \frac{1}{2\pi} \int_0^{2\pi} u(\phi+\gamma, t)\, u(\phi, t)\, d\phi \]
+      </div>
+      <div class="highlight-box">
+        <strong>Interpretation:</strong>
+        ξ(0) &gt; 0 always (self-correlation) ·
+        ξ(π/2) &lt; 0 indicates anti-correlation (quadrupolar mode dominates) ·
+        Double-bell shape ∝ P₂(cos γ) is the signature of l=2 mode dominance.
+      </div>
+    </div>
+
+    <!-- 5. Legendre Expansion -->
+    <div class="theory-section" id="legendre">
+      <h2 class="theory-h2"><span class="num">05</span>Legendre Expansion</h2>
+      <p class="theory-p">
+        The time-averaged theoretical autocorrelation expands naturally as:
+      </p>
+      <div class="math-block">
+        \[ \langle \xi^{th}(\gamma) \rangle = \sum_{l \geq 2} b_l \, P_l(\cos\gamma) \]
+      </div>
+      <p class="theory-p">where the Legendre coefficients are:</p>
+      <div class="math-block">
+        \[ b_l = \frac{2l+1}{4\pi} \langle|u_{lm}|^2\rangle = \frac{2l+1}{4\pi} \cdot \frac{k_B T}{\kappa(l-1)(l+2)[l(l+1)+\Sigma]} \]
+      </div>
+      <p class="theory-p">
+        The experimental ξ^exp(γ) is fitted to this expression. The fit parameters are:
+        j = kBT/κ and s = Σ.
+      </p>
+      <h3 class="theory-h3">Double-Bell Structure (l = 2)</h3>
+      <p class="theory-p">
+        The l=2 (quadrupolar) mode gives P₂(cos γ) = ½(3cos²γ − 1). This has:
+      </p>
+      <div class="math-block">
+        \[ \text{maxima at } \gamma = 0, \pi \quad (+1) \qquad \text{minima at } \gamma = \tfrac{\pi}{2}, \tfrac{3\pi}{2} \quad (-\tfrac{1}{2}) \]
+      </div>
+      <p class="theory-p">
+        This characteristic double-bell shape in ξ(γ) is the signature of an ellipsoidal
+        (quadrupolar) deformation mode. Points at γ=0 and γ=π are along the elongation axis
+        (positively correlated), while points at γ=π/2 are perpendicular (anti-correlated).
+      </p>
+    </div>
+
+    <!-- 6. Parameter Extraction -->
+    <div class="theory-section" id="extraction">
+      <h2 class="theory-h2"><span class="num">06</span>Parameter Extraction (χ² Method)</h2>
+      <p class="theory-p">
+        The theoretical mean Legendre coefficient is:
+      </p>
+      <div class="math-block">
+        \[ \bar{B}_l(j, s) = \frac{j}{p_l + s\, q_l} \]
+        \[ p_l = \frac{4\pi(l-1)(l+2)(l+1)l}{2l+1} \qquad q_l = \frac{4\pi(l-1)(l+2)}{2l+1} \]
+        \[ j = \frac{k_B T}{\kappa} \qquad s = \Sigma \]
+      </div>
+      <p class="theory-p">Define the goodness-of-fit as:</p>
+      <div class="math-block">
+        \[ \chi^2(j, s) = \sum_{l=l_{min}}^{l_{max}} \left[ \frac{B_l - \bar{B}_l(j,s)}{\sigma_l} \right]^2 \]
+      </div>
+      <p class="theory-p">
+        Setting ∂χ²/∂j = 0 gives j as an explicit function of s:
+      </p>
+      <div class="math-block">
+        \[ j(s) = \frac{\displaystyle\sum_l \frac{p_l B_l}{(p_l \sigma_l)^2} \left(1 + s\frac{q_l}{p_l}\right)}
+                       {\displaystyle\sum_l \frac{1}{(p_l \sigma_l)^2} \left(1 + s\frac{q_l}{p_l}\right)^2} \]
+      </div>
+      <p class="theory-p">
+        Substituting j(s) back into χ²(j(s), s) gives a 1D function of s only.
+        Its minimum is found numerically (golden-section search). The optimal s = Σ
+        is then inserted into j(s) to get j, and hence κ = kBT/j.
+      </p>
+    </div>
+
+    <!-- 7. Errors -->
+    <div class="theory-section" id="errors">
+      <h2 class="theory-h2"><span class="num">07</span>Error Estimation</h2>
+      <p class="theory-p">
+        Near the χ² minimum, a Gaussian approximation gives the covariance matrix:
+      </p>
+      <div class="math-block">
+        \[ H' = \begin{pmatrix} \partial^2\chi^2/\partial j^2 & \partial^2\chi^2/\partial j \partial s \\
+        \partial^2\chi^2/\partial s\partial j & \partial^2\chi^2/\partial s^2 \end{pmatrix}^{-1}_\text{min} \]
+      </div>
+      <p class="theory-p">The variances of the fitted parameters are:</p>
+      <div class="math-block">
+        \[ \sigma^2(j) = H'_{11} \qquad \sigma^2(s) = H'_{22} \]
+        \[ \sigma^2(\kappa) = H'_{11} \cdot \frac{\kappa^2}{j^2} \cdot k_B^2 T^2 \]
+      </div>
+    </div>
+
+    <!-- 8. References -->
+    <div class="theory-section" id="references">
+      <h2 class="theory-h2"><span class="num">08</span>References</h2>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div class="info-block">
+          [1] Brochard &amp; Lennon, <em>J. de Physique</em> <strong>36</strong>, 1035–1047 (1975) —
+          Frequency spectrum of flicker phenomenon in erythrocytes.
+        </div>
+        <div class="info-block">
+          [2] Helfrich, <em>Z. Naturforsch. C</em> <strong>28</strong>, 693–703 (1973) —
+          Elastic properties of lipid bilayers.
+        </div>
+        <div class="info-block">
+          [3] Kumar et al., <em>Chem. Phys. Lipids</em> <strong>259</strong>, 105374 (2024) —
+          Bottom-up approach to explore α-amylase assisted membrane remodelling.
+        </div>
+        <div class="info-block">
+          [4] Dimova &amp; Marques, <em>The Giant Vesicle Book</em>, CRC Press (2019).
+        </div>
+        <div class="info-block">
+          [5] Faucon et al., <em>J. de Physique</em> <strong>50</strong>, 2389–2414 (1989) —
+          Bending elasticity and thermal fluctuations of lipid membranes.
+        </div>
+      </div>
+    </div>
+
+  </div><!-- theory-body -->
+</div>
+
+</body>
+</html>
+
+
+

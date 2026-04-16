@@ -1,0 +1,53 @@
+===== PAGE 3 =====
+- Chemistry and Physics of Lipids 259 (2024) 105374 3 2.4.
+- POPC GUV experiments with the enzyme POPC GUVs (50 l) from the stock solution with varying concen - trations of alpha-amylase (AA) (0.1 500) M were incubated for 1 h in MilliQ.
+- After incubation, the GUV incubated with the alpha-amylase solution was filtered through 50 kDa filters (purchased from SIGMA, catalog number UFC505008) to separate unbound free AA from the GUV-bound enzyme.
+- The absorbance obtained from the filtrate is proportional to the free (unbound) alpha-amylase concentration in the solution.
+- The concentration of unbound Alpha Amylase was calculated using the value of 280 = (0.01818 0.00045) M 1 cm 1 .
+- AA interaction with POPC GUV membrane in water The POPC GUVs (50 l) from the stock solution with different con - centrations of Alpha-Amylase (AA) were incubated for 1 h in MilliQ.
+- The measurement of absorbance in the filtrate provides direct data on the concentration of free alpha-amylase in a GUV suspension ( C f P ) given by C f P = A 280 A 320 280 (2) where A 280 A 320 is the absorbance reading at 280 nm minus the absorbance reading at 320 nm (baseline) and 280 is defined in Eq.
+- ( 2 ) by measuring the absorbance in the filtrate.
+- 3 , the ratio ( C b P C P ) is represented with varying levels of Alpha-Amylase (AA).
+- The partition constant for the transfer of AA from the aqueous so - lution to the outer leaflet of the bilayer membrane is defined by Vitkova et al.
+- 5 C L C f P (3) where X b is the fraction of the AA bound to the outer leaflet of the bilayer membrane and the total lipid concentration as C L .
+- Theory of vesicle shape fluctuations It was the work of Brochard and Lennon Brochard & Lennon (1975) that showed the potential to analyze conformational fluctuations of the micrograph membrane to obtain an estimate of the parameters of the Helfrich model.
+- Vesicle conformations are well described by the Helfrich free energy, which is a general formulation that takes the form Helfrich (1973) .
+- F Hel = S [ 2 ( 2 H C 0 ) 2 ] dA + A (4) for a single vesicle with spherical topology.
+- The properties of the ma - terial are characterized by three parameters: the elastic modulus of bending ( ), the internal tension of the membrane ( ) and the sponta - neous curvature ( C 0 ).
+- Marsh (2006) H , A represent the local mean cur - vature and the total surface area of the GUV, respectively.
+- In general, it is very difficult to describe conformational fluctuations based on Eq.
+- Quasi-spherical membranes: For many experimental vesicles, a realistic approximation of conformational fluctuations is to consider small deviations from the spherical shape.
+- (1989) The quasi-spherical approximate form can naturally be decomposed into spherical harmonics ( Y n l ) where l , n are the mode numbers.
+- u ( , ) = l n u ln Y n l ( , ) (6) which corresponds to the Fourier decomposition on a flat background.
+- (1985) Employing the equi - partition theorem gives the following Faucon et al.
+- ( 7 ) gives the possibility of obtaining estimates of the model pa - rameters from fluctuation data.
+- This analysis is based on linearizing the complex nonlinear Eq.
+- ( 4 ), which relates the correlation functions directly to the Hamiltonian.
+- Experimental finding of the quasi-spherical fluctuation spectrum Contour detection: For a closed membrane compartment, such as a quasi-spherical giant unilamellar vesicle (GUV), the camera captures the position of the equatorial contour of the GUV membrane.
+- 4 b,c show the instantaneous contour of the vesicle and the center of the same GUV, respectively.
+- The average value (shown by the red line) of ( C b P C P ) is 0.88 0.03.
+===== PAGE 4 =====
+- Chemistry and Physics of Lipids 259 (2024) 105374 4 r avg ( t ) = 1 2 2 0 r eq ( , t ) d (9) The algorithm requires users to select an approximate center, an approximate average radius, and the width of the region of interest in the first frame of the data.
+- The width of the region of interest is sym - metric with respect to the average radius selected by the user.
+- A radial intensity profile r eq ( , t ) is extracted for the contour points of X eq ( , t ) from each frame at regular intervals of polar angle ( ).
+- The pixel location of the minima is used as the contour point for dark boundary GUVs.
+- The continuous angular auto-correlation function at the equator is given as eq ( , t ) = 1 2 r avg ( t ) 2 2 0 [ r eq ( + , t ) r eq ( , t ) r avg ( t ) 2 ] d (10) Ideally, a smooth and symmetric double well should be obtained as the angular auto-correlation function, as shown in Fig.
+- The equatorial contour of quasi-spherical vesicles is approximately circular, inviting one to explore the periodicity to decompose the configurations into periodic modes.
+- The angular corre - lation function is most appropriate for the analysis of fluctuations.
+- The experimental exp ( , t ) can easily be obtained from the contours obtained and can be expressed in terms of u ( 2, , t ): exp ( , t ) = 1 2 2 0 d [ u ( 2 , + , t ) u ( 2 , , t ) u ( t ) 2 ] (11) where u ( t ) = 1 2 2 0 d u ( 2 , , t ) .
+- The corresponding theoretical values of th ( , t ) take the form of th ( , t ) = l 1 0 l 2 0 n = 0 u l 1 n ( t ) u l 2 n ( t ) Y l 1 n ( 2 , ) Y l 2 n ( 2 , 0 ) (12) The average th ( ) can be obtained by replacing the temporal average with a thermal average (ergodic hypothesis) and employing Eq.
+- A sum rule for spherical harmonic functions has been applied in Eq.
+- th ( ) = l 1 0 n = 0 u l 1 n u l 1 n n Y l 1 n ( 2 , ) Y l 1 n ( 2 , 0 ) = 1 2 l 0 2 l + 1 2 u l 1 n | 2 P l ( cos ) = l 0 b l P l ( cos ) (13) where P l is the Legendre polynomial.
+- 6 shows the Legendre spec - trum for mode number two ( l = 2) for a POPC GUV.
+- ( 13 ) shows that the natural basis for the mode decomposition of the equatorial contours is the Legendre functions P l ( cos ) in the sense that the amplitudes of th ( ) can be expressed directly by the model parameters.
+- Then we can identify th ( ) and exp ( ) in a fitting procedure.
+- ( 7 ) and ( 13 ), the theoretical mean of the Legendre coefficients is given as B l ( j , s ) = j p l + sq l (15) where q l = 4 ( l 1 )( l + 2 ) 2 l + 1 p l = 4 ( l 1 )( l + 2 )( l + 1 ) l 2 l + 1 j = ( k B T ) s = Substituting B l ( j , s ) from Eq.
+===== PAGE 5 =====
+- Chemistry and Physics of Lipids 259 (2024) 105374 5 2 s = 2 l q l p l j ( p l l ) 2 ( 1 + s q l p l ) 2 p l B l j 1 + s q l p l = 0 (18) The two equations form a set of implicit expressions for the estima - tors of and .
+- ( 16 ), to obtain 2 only depending on s and the minimum of 2 can be obtained as shown in Fig.
+- ( 19 ) and hence the bending rigidity ( ).
+- Therefore, the obtained and s are used to obtain the theoretical mean values of the Legendre coefficients.
+- 9 shows the fit of the theoretical and experimental mean of the Legendre coefficients that give an estimate of the bending rigidity values ( ) for GUVs.
+- The covariance matrix H from Gaussian approximation is given as, H = 2 2 j 2 2 2 j s 2 2 j s 2 2 s 2 1 min (21) where the components are 2 2 j 2 = 2 l 1 ( p l l ) 2 ( 1 + s q l p l ) 2 (22) 2 2 j s = 2 l q l p l 1 ( p l l ) 2 ( 1 + s q l p l ) 2 p l B l 2 j 1 + s q l p l (23) 2 2 s 2 = 2 l ( q l p l ) 2 1 ( p l l ) 2 ( 1 + s q l p l ) 3 3 j 1 + s q l p l 2 p l B l (24) The error in ( ) is given by H 11 and the error in ( s ) is given by H 22 .
+- Legendre spectrum for l = 2 mode is shown.
+- Time average Legendre Coefficients for different modes for a single GUV composed of POPC, prepared in 10 mM HEPES.

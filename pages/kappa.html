@@ -1,0 +1,521 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>κ Extraction — GUV Fluctuation Suite</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']]
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+  </script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    .panel-section { padding: 20px; border-bottom: 1px solid var(--border); }
+    .panel-section:last-child { border-bottom: none; }
+    .panel-section-title {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.12em; color: var(--text-dim); margin-bottom: 14px;
+      font-family: var(--font-mono);
+    }
+    .chart-container { height: 300px; }
+    .data-input-row {
+      display: grid;
+      grid-template-columns: 50px 1fr 1fr auto;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .data-input-row .row-label {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--cyan);
+      text-align: right;
+    }
+    .data-input-row input {
+      padding: 6px 8px;
+      font-size: 12px;
+    }
+    .data-input-row .remove-btn {
+      background: none;
+      border: 1px solid var(--border2);
+      color: var(--text-dim);
+      width: 26px; height: 26px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .data-input-row .remove-btn:hover { border-color: var(--rose); color: var(--rose); }
+    .result-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+    }
+    .kappa-display {
+      font-size: 48px;
+      font-weight: 800;
+      color: var(--cyan);
+      letter-spacing: -0.04em;
+      line-height: 1;
+      margin: 8px 0;
+    }
+    .kappa-display sup { font-size: 20px; color: var(--text-mid); vertical-align: super; }
+  </style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="topnav-brand" href="../index.html">⬡ <span>GUV</span>FlickerSuite</a>
+  <a href="../index.html">Home</a>
+  <a href="theory.html">Theory</a>
+  <a href="autocorrelation.html">Auto-Corr</a>
+  <a href="legendre.html">Legendre</a>
+  <a href="kappa.html" class="active">κ Extraction</a>
+  <a href="computational-workflow.html">Workflow</a>
+</nav>
+
+<div class="page-wrapper">
+  <div class="page-hero">
+    <div class="badge">Parameter Extraction</div>
+    <h1>Extract <span class="accent">κ</span> and <span class="accent">Σ</span></h1>
+    <p>
+      Input your experimental time-averaged Legendre coefficients B<sub>l</sub> ± σ<sub>l</sub>.
+      The tool minimises χ² to find the best-fit bending rigidity κ and effective surface tension Σ,
+      with full error estimates from the covariance matrix.
+    </p>
+  </div>
+
+  <div class="grid-2">
+    <!-- Left: Data Input -->
+    <div class="card" style="padding:0;">
+      <div class="panel-section">
+        <div class="panel-section-title">Experimental Data — B<sub>l</sub> ± σ<sub>l</sub></div>
+
+        <div class="info-block">
+          Enter time-averaged Legendre coefficients. Each row: mode l, mean B<sub>l</sub>, standard error σ<sub>l</sub>.
+          Values are typically in range 10⁻⁵ – 10⁻³.
+        </div>
+
+        <!-- Column headers -->
+        <div class="data-input-row" style="margin-top:12px; margin-bottom:4px;">
+          <div class="row-label" style="color:var(--text-dim);">l</div>
+          <div style="font-size:10px; color:var(--text-dim); font-family:var(--font-mono); letter-spacing:0.1em;">B<sub>l</sub> (exp mean)</div>
+          <div style="font-size:10px; color:var(--text-dim); font-family:var(--font-mono); letter-spacing:0.1em;">σ<sub>l</sub> (std error)</div>
+          <div></div>
+        </div>
+
+        <div id="dataRows"></div>
+
+        <button class="btn btn-secondary" onclick="addRow()" style="margin-top:10px; font-size:11px; padding:7px 14px;">+ Add Mode</button>
+      </div>
+
+      <!-- Load Presets -->
+      <div class="panel-section">
+        <div class="panel-section-title">Load Example Dataset</div>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <button class="btn btn-secondary" onclick="loadPreset('popc_water')" style="font-size:11px;padding:8px 12px;text-align:left;justify-content:flex-start;">
+            POPC in water (κ ≈ 40.9 kBT)
+          </button>
+          <button class="btn btn-secondary" onclick="loadPreset('popc_hepes')" style="font-size:11px;padding:8px 12px;text-align:left;justify-content:flex-start;">
+            POPC in HEPES (κ ≈ 37.3 kBT)
+          </button>
+          <button class="btn btn-secondary" onclick="loadPreset('popc_chol')" style="font-size:11px;padding:8px 12px;text-align:left;justify-content:flex-start;">
+            POPC + Chol 10% (κ ≈ 53.3 kBT)
+          </button>
+          <button class="btn btn-secondary" onclick="loadPreset('popc_aa_low')" style="font-size:11px;padding:8px 12px;text-align:left;justify-content:flex-start;">
+            POPC + AA 0.14 µM (κ ≈ 59.3 kBT)
+          </button>
+          <button class="btn btn-secondary" onclick="loadPreset('popc_aa_high')" style="font-size:11px;padding:8px 12px;text-align:left;justify-content:flex-start;">
+            POPC + AA 1.34 µM (κ ≈ 49.7 kBT)
+          </button>
+        </div>
+      </div>
+
+      <!-- Fit settings -->
+      <div class="panel-section">
+        <div class="panel-section-title">Fit Settings</div>
+        <div class="form-group">
+          <label class="form-label">Σ search range [s<sub>min</sub>, s<sub>max</sub>]</label>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <input type="number" id="smin" value="-20" step="5">
+            <input type="number" id="smax" value="200" step="5">
+          </div>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="runFit()" style="margin-top:8px;">
+          ▶ Run χ² Minimisation
+        </button>
+      </div>
+    </div>
+
+    <!-- Right: Results + Charts -->
+    <div style="display:flex; flex-direction:column; gap:20px;">
+
+      <!-- Main Result -->
+      <div class="result-card" id="resultCard">
+        <div style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.15em; color:var(--text-dim); font-family:var(--font-mono); margin-bottom:12px;">
+          Extracted Parameters
+        </div>
+        <div style="color:var(--text-dim); font-family:var(--font-mono); font-size:13px; padding:20px 0;">
+          Load data and click "Run χ² Minimisation" to extract parameters.
+        </div>
+      </div>
+
+      <!-- χ² vs s curve -->
+      <div class="chart-wrap">
+        <div class="chart-title">χ²(s) — Surface Tension Scan</div>
+        <div class="chart-container">
+          <canvas id="chi2Chart"></canvas>
+        </div>
+        <div class="chart-subtitle">
+          Minimum of \(\chi^2(s)\) gives optimal \(\Sigma\), then \(\kappa=k_B T/j\).
+        </div>
+      </div>
+
+      <!-- Theory vs Experiment fit -->
+      <div class="chart-wrap">
+        <div class="chart-title">Fit: B<sub>l</sub> Theory vs Experiment</div>
+        <div class="chart-container">
+          <canvas id="fitChart"></canvas>
+        </div>
+        <div class="chart-subtitle">
+          Circles = experimental B<sub>l</sub> ± σ<sub>l</sub> · Dashed = theoretical B̄<sub>l</sub>(κ, Σ)
+        </div>
+      </div>
+
+      <!-- Residuals -->
+      <div class="chart-wrap" id="residualsWrap" style="display:none;">
+        <div class="chart-title">Normalised Residuals (B<sub>l</sub> − B̄<sub>l</sub>) / σ<sub>l</sub></div>
+        <div class="chart-container" style="height:180px;">
+          <canvas id="residChart"></canvas>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="../js/physics.js"></script>
+<script>
+// ─── Example datasets (synthetic, physics-consistent) ─────────
+function syntheticData(kappa_true, sigma_true, noiseLevel = 0.08) {
+  const modes = [2,3,4,5,6,7,8,9,10];
+  return modes.map(l => {
+    const bl_true = bl_theory(l, kappa_true, sigma_true);
+    const noise = bl_true * noiseLevel * (0.5 + Math.random());
+    return { l, Bl: bl_true * (1 + (Math.random()-0.5)*noiseLevel), sigma: noise };
+  });
+}
+
+const PRESETS = {
+  popc_water:   { kappa: 40.9, sigma: 8,  label: 'POPC water' },
+  popc_hepes:   { kappa: 37.3, sigma: 10, label: 'POPC HEPES' },
+  popc_chol:    { kappa: 53.3, sigma: 12, label: 'POPC+Chol' },
+  popc_aa_low:  { kappa: 59.3, sigma: 15, label: 'POPC+AA 0.14µM' },
+  popc_aa_high: { kappa: 49.7, sigma: 12, label: 'POPC+AA 1.34µM' },
+};
+
+// ─── Dynamic row management ────────────────────────────────────
+let rowId = 0;
+function addRow(l='', Bl='', sigma='') {
+  rowId++;
+  const rid = rowId;
+  const div = document.createElement('div');
+  div.className = 'data-input-row';
+  div.id = 'row_' + rid;
+  div.innerHTML = `
+    <div class="row-label">l=</div>
+    <input type="number" id="l_${rid}" value="${l}" min="2" max="30" step="1" placeholder="2">
+    <input type="number" id="Bl_${rid}" value="${Bl}" step="any" placeholder="e.g. 3.5e-4">
+    <input type="number" id="sig_${rid}" value="${sigma}" step="any" placeholder="e.g. 2e-5">
+    <button class="remove-btn" onclick="removeRow(${rid})">×</button>
+  `;
+  document.getElementById('dataRows').appendChild(div);
+}
+function removeRow(rid) {
+  const el = document.getElementById('row_' + rid);
+  if (el) el.remove();
+}
+
+function getDataRows() {
+  const rows = document.getElementById('dataRows').querySelectorAll('.data-input-row');
+  const data = [];
+  rows.forEach(row => {
+    const rid = row.id.replace('row_', '');
+    const l  = parseFloat(document.getElementById('l_'   + rid)?.value);
+    const Bl = parseFloat(document.getElementById('Bl_'  + rid)?.value);
+    const sg = parseFloat(document.getElementById('sig_' + rid)?.value);
+    if (!isNaN(l) && !isNaN(Bl) && !isNaN(sg) && sg > 0) {
+      data.push({ l: Math.round(l), Bl, sigma: sg });
+    }
+  });
+  return data.sort((a,b) => a.l - b.l);
+}
+
+function clearRows() {
+  document.getElementById('dataRows').innerHTML = '';
+  rowId = 0;
+}
+
+function loadPreset(name) {
+  const p = PRESETS[name];
+  if (!p) return;
+  clearRows();
+  const data = syntheticData(p.kappa, p.sigma);
+  data.forEach(d => addRow(d.l, d.Bl.toExponential(5), d.sigma.toExponential(5)));
+}
+
+// ─── Fit ──────────────────────────────────────────────────────
+let chi2ChartInst = null, fitChartInst = null, residChartInst = null;
+
+function runFit() {
+  const rawData = getDataRows();
+  if (rawData.length < 3) {
+    alert('Please add at least 3 data points.');
+    return;
+  }
+  const modes = rawData.map(d => d.l);
+  const Bl_exp = rawData.map(d => d.Bl);
+  const sigma_l = rawData.map(d => d.sigma);
+  const s_min = parseFloat(document.getElementById('smin').value);
+  const s_max = parseFloat(document.getElementById('smax').value);
+
+  // Run chi2 curve
+  const { sVals, c2Vals } = chi2Curve(Bl_exp, sigma_l, modes, s_min, s_max, 300);
+
+  // Find minimum
+  const { s_opt, j_opt } = minimizeChiSquared(Bl_exp, sigma_l, modes, s_min, s_max);
+  const chi2_min = chi2(s_opt, Bl_exp, sigma_l, modes);
+  const kappa_fit = 1.0 / j_opt;
+  const { H11, H22 } = covarianceMatrix(j_opt, s_opt, Bl_exp, sigma_l, modes);
+  const sigma_kappa = Math.sqrt(H11) * kappa_fit * kappa_fit * j_opt;
+  const sigma_Sigma = Math.sqrt(Math.max(0, H22));
+
+  // ── Result card ──
+  document.getElementById('resultCard').innerHTML = `
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;color:var(--text-dim);font-family:var(--font-mono);margin-bottom:16px;">
+      Extracted Parameters
+    </div>
+    <div class="kappa-display">${kappa_fit.toFixed(2)} <sup>kBT</sup></div>
+    <div style="color:var(--text-mid);font-family:var(--font-mono);font-size:13px;margin-bottom:20px;">
+      ± ${sigma_kappa.toFixed(2)} kBT (1σ)
+    </div>
+    <div class="result-row" style="border-top:1px solid var(--border); padding-top:12px;">
+      <span class="result-key">κ (bending rigidity)</span>
+      <span class="result-val">${kappa_fit.toFixed(3)} ± ${sigma_kappa.toFixed(3)} kBT</span>
+    </div>
+    <div class="result-row">
+      <span class="result-key">Σ (effective surface tension)</span>
+      <span class="result-val">${s_opt.toFixed(3)} ± ${sigma_Sigma.toFixed(3)}</span>
+    </div>
+    <div class="result-row">
+      <span class="result-key">j = kBT/κ</span>
+      <span class="result-val">${j_opt.toExponential(4)}</span>
+    </div>
+    <div class="result-row">
+      <span class="result-key">χ²<sub>min</sub></span>
+      <span class="result-val">${chi2_min.toFixed(4)}</span>
+    </div>
+    <div class="result-row">
+      <span class="result-key">χ²/dof</span>
+      <span class="result-val">${(chi2_min / Math.max(1, modes.length - 2)).toFixed(3)}</span>
+    </div>
+  `;
+
+  // ── χ² curve ──
+  if (chi2ChartInst) chi2ChartInst.destroy();
+  chi2ChartInst = new Chart(document.getElementById('chi2Chart').getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: sVals,
+      datasets: [
+        {
+          label: 'χ²(s)',
+          data: c2Vals,
+          borderColor: '#3a4f6c',
+          backgroundColor: 'rgba(58,79,108,0.08)',
+          borderWidth: 2,
+          fill: true,
+          pointRadius: 0,
+          tension: 0.3,
+        },
+        {
+          label: 'χ²_min',
+          data: sVals.map(s => Math.abs(s - s_opt) < (s_max - s_min)/60 ? chi2_min : null),
+          borderColor: '#2a486b',
+          backgroundColor: '#2a486b',
+          borderWidth: 0,
+          pointRadius: 8,
+          pointStyle: 'crossRot',
+          showLine: false,
+          spanGaps: false,
+        }
+      ]
+    },
+    options: {
+      animation: { duration: 300 },
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#111827', borderColor: '#334155', borderWidth: 1,
+          titleFont: { family: 'Times New Roman' }, bodyFont: { family: 'Times New Roman', size: 11 },
+          callbacks: {
+            title: items => `Σ = ${parseFloat(items[0].label).toFixed(2)}`,
+            label: item => ` χ² = ${parseFloat(item.raw).toFixed(4)}`,
+          }
+        }
+      },
+      scales: {
+        x: {
+          type: 'linear',
+          title: { display: true, text: 's = Σ', color: '#e5e7eb', font: { family: 'Times New Roman', size: 11 } },
+          ticks: { color: '#e5e7eb', font: { family: 'Times New Roman', size: 10 } },
+          grid: { color: 'rgba(148,163,184,0.14)' },
+        },
+        y: {
+          title: { display: true, text: 'χ²', color: '#e5e7eb', font: { family: 'Times New Roman', size: 11 } },
+          ticks: { color: '#e5e7eb', font: { family: 'Times New Roman', size: 10 } },
+          grid: { color: 'rgba(148,163,184,0.14)' },
+        }
+      }
+    }
+  });
+
+  // ── Theory vs Experiment fit ──
+  const Bl_theory_vals = modes.map(l => Bl_bar(l, j_opt, s_opt));
+  if (fitChartInst) fitChartInst.destroy();
+  fitChartInst = new Chart(document.getElementById('fitChart').getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: modes,
+      datasets: [
+        {
+          label: 'Experimental B_l',
+          data: Bl_exp,
+          borderColor: '#2a486b',
+          backgroundColor: '#2a486b',
+          borderWidth: 0,
+          pointRadius: 6,
+          pointStyle: 'circle',
+          showLine: false,
+          errorBars: sigma_l,
+        },
+        {
+          label: `Theory (κ=${kappa_fit.toFixed(1)}, Σ=${s_opt.toFixed(1)})`,
+          data: Bl_theory_vals,
+          borderColor: '#5a566f',
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          borderDash: [6, 4],
+          pointRadius: 4,
+          pointBackgroundColor: '#5a566f',
+          tension: 0.1,
+        }
+      ]
+    },
+    options: {
+      animation: { duration: 300 },
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {
+          display: true,
+          labels: { color: '#e5e7eb', font: { family: 'Times New Roman', size: 10 }, boxWidth: 12 }
+        },
+        tooltip: {
+          backgroundColor: '#111827', borderColor: '#334155', borderWidth: 1,
+          titleFont: { family: 'Times New Roman' }, bodyFont: { family: 'Times New Roman', size: 11 },
+          callbacks: {
+            title: items => `l = ${items[0].label}`,
+            label: item => ` ${item.dataset.label}: ${parseFloat(item.raw).toExponential(4)}`,
+          }
+        }
+      },
+      scales: {
+        x: {
+          title: { display: true, text: 'Mode l', color: '#e5e7eb', font: { family: 'Times New Roman', size: 11 } },
+          ticks: { color: '#e5e7eb', font: { family: 'Times New Roman', size: 11 } },
+          grid: { color: 'rgba(148,163,184,0.14)' },
+        },
+        y: {
+          type: 'logarithmic',
+          title: { display: true, text: 'B_l', color: '#e5e7eb', font: { family: 'Times New Roman', size: 11 } },
+          ticks: { color: '#e5e7eb', font: { family: 'Times New Roman', size: 10 }, callback: v => v.toExponential(1) },
+          grid: { color: 'rgba(148,163,184,0.14)' },
+        }
+      }
+    }
+  });
+
+  // ── Residuals ──
+  document.getElementById('residualsWrap').style.display = 'block';
+  const residuals = modes.map((l, i) => (Bl_exp[i] - Bl_theory_vals[i]) / sigma_l[i]);
+  if (residChartInst) residChartInst.destroy();
+  residChartInst = new Chart(document.getElementById('residChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: modes,
+      datasets: [{
+        label: 'normalised residual',
+        data: residuals,
+        backgroundColor: residuals.map(r => Math.abs(r) > 2 ? 'rgba(139,74,74,0.6)' : 'rgba(42,72,107,0.4)'),
+        borderColor: residuals.map(r => Math.abs(r) > 2 ? '#6c4d56' : '#2a486b'),
+        borderWidth: 1,
+        borderRadius: 3,
+      }]
+    },
+    options: {
+      animation: { duration: 200 },
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#111827', borderColor: '#334155', borderWidth: 1,
+          titleFont: { family: 'Times New Roman' }, bodyFont: { family: 'Times New Roman', size: 11 },
+          callbacks: {
+            title: items => `l = ${items[0].label}`,
+            label: item => ` residual = ${parseFloat(item.raw).toFixed(3)} σ`,
+          }
+        }
+      },
+      scales: {
+        x: {
+          title: { display: true, text: 'Mode l', color: '#e5e7eb', font: { family: 'Times New Roman', size: 11 } },
+          ticks: { color: '#e5e7eb', font: { family: 'Times New Roman', size: 11 } },
+          grid: { color: 'rgba(148,163,184,0.14)' },
+        },
+        y: {
+          title: { display: true, text: '(B_l - B̄_l)/σ_l', color: '#e5e7eb', font: { family: 'Times New Roman', size: 11 } },
+          ticks: { color: '#e5e7eb', font: { family: 'Times New Roman', size: 10 } },
+          grid: { color: 'rgba(148,163,184,0.14)' },
+        }
+      }
+    }
+  });
+}
+
+// ─── Init: load default dataset ───────────────────────────────
+loadPreset('popc_water');
+if (window.MathJax && typeof window.MathJax.typesetPromise === 'function') {
+  window.MathJax.typesetPromise();
+}
+</script>
+</body>
+</html>
+
+
+
