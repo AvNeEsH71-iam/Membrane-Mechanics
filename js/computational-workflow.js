@@ -1,4 +1,4 @@
-﻿/*
+/*
  * computational-workflow.js
  * Interactive end-to-end tutorial pipeline for quasi-spherical vesicle analysis.
  */
@@ -779,7 +779,13 @@
           },
           y: {
             title: { display: true, text: "ξ", color: "#e5e7eb" },
-            ticks: { color: "#e5e7eb" },
+            ticks: {
+              color: "#e5e7eb",
+              callback: (v) => {
+                const n = Number(v);
+                return Number.isFinite(n) ? n.toExponential(2) : v;
+              },
+            },
             grid: { color: "rgba(148,163,184,0.14)" },
           },
         },
