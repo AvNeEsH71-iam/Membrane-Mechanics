@@ -5,7 +5,7 @@ A fully browser-based, interactive tool for analysing thermal shape fluctuations
 - **Visualise** angular auto-correlation functions for any combination of spherical-harmonic modes
 - **Compute** Legendre spectrum coefficients *B_l*
 - **Fit** bending rigidity *κ* and effective surface tension *Σ* via χ² minimisation
-- **Understand** the mathematics — every formula is rendered with MathJax and explained inline
+- **Understand** the mathematics and every formula is rendered with MathJax and explained inline
 
 Model scope note:
 
