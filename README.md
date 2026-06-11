@@ -72,7 +72,7 @@ $$p_l = \frac{4\pi(l-1)(l+2)(l+1)l}{2l+1}, \quad q_l = \frac{4\pi(l-1)(l+2)}{2l+
 
 ## Features by Page
 
-| Page | What you can do |
+| Page | What's possible to do |
 |------|----------------|
 | **Auto-Correlation** | Choose modes l=2…10, set κ and Σ, visualise ξ(γ) and P_l(cos γ) contributions |
 | **Legendre Spectrum** | Plot B_l vs l; adjust κ, Σ, R; see how each mode amplitude decays |
